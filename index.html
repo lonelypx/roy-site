@@ -189,6 +189,12 @@
   .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   .form-note{font-size:12.5px;color:var(--ink-soft);margin-top:14px;display:flex;gap:8px;align-items:center}
   .form-note svg{width:15px;height:15px;stroke:var(--forest)}
+  .form-card .btn svg{width:18px;height:18px}
+  .or-divider{display:flex;align-items:center;gap:12px;margin:14px 0;color:var(--ink-soft);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  .or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+  .form-status{margin-top:14px;font-size:13.5px;padding:11px 14px;border-radius:10px;line-height:1.5}
+  .form-status.ok{background:var(--sage-pale);color:var(--forest)}
+  .form-status.err{background:#F4E2DE;color:#9A3B2E}
 
   /* Footer */
   footer{background:var(--forest);color:rgba(247,244,238,.8);padding:54px 0 30px}
@@ -445,7 +451,13 @@
       </div>
       <div class="field"><label for="fphone">Phone number</label><input id="fphone" type="tel" placeholder="+91"></div>
       <div class="field"><label for="fmsg">Message</label><textarea id="fmsg" placeholder="Tell us a little about what you'd like to talk about — or just say hello."></textarea></div>
-      <button class="btn btn-solid" type="button" style="width:100%;justify-content:center">Send Message →</button>
+      <button class="btn btn-solid" type="button" id="waBtn" style="width:100%;justify-content:center">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l4.9-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.2 0-.3 0-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.9 4.5 4 .6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.4-.2z"/></svg>
+        Send via WhatsApp
+      </button>
+      <div class="or-divider">or</div>
+      <button class="btn btn-outline" type="button" id="emailBtn" style="width:100%;justify-content:center">Email Us Instead →</button>
+      <p class="form-status" id="formStatus" hidden></p>
       <p class="form-note"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Your message is private and confidential.</p>
     </div>
   </div>
@@ -498,6 +510,59 @@
   // Close mobile menu on link click
   links.forEach(l => l.addEventListener('click', () =>
     document.getElementById('navLinks').classList.remove('open')));
+
+  // ===== Contact form: WhatsApp + email (FormSubmit) =====
+  // ↓↓↓ REPLACE THESE TWO with real values ↓↓↓
+  const WHATSAPP_NUMBER = '911234567890';     // country code + number, digits only (no + or spaces)
+  const FORM_EMAIL      = 'letstalkheal@gmail.com';  // inbox that receives form submissions
+  // ↑↑↑ REPLACE THESE TWO with real values ↑↑↑
+
+  const f = id => document.getElementById(id);
+  const statusEl = f('formStatus');
+  const readFields = () => ({
+    name:  f('fname').value.trim(),
+    email: f('femail').value.trim(),
+    phone: f('fphone').value.trim(),
+    msg:   f('fmsg').value.trim(),
+  });
+  const showStatus = (text, ok) => {
+    statusEl.textContent = text;
+    statusEl.className = 'form-status ' + (ok ? 'ok' : 'err');
+    statusEl.hidden = false;
+  };
+
+  f('waBtn').addEventListener('click', () => {
+    const v = readFields();
+    if (!v.name && !v.msg) { showStatus('Please add your name or a short message first.', false); return; }
+    const text = `Hi, I'd like to book a session.\n\nName: ${v.name || '—'}\nEmail: ${v.email || '—'}\nPhone: ${v.phone || '—'}\n\n${v.msg || ''}`;
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+  });
+
+  f('emailBtn').addEventListener('click', async (e) => {
+    const v = readFields();
+    if (!v.email || !v.msg) { showStatus('Please add your email and a message so we can reply.', false); return; }
+    const btn = e.currentTarget, label = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      const r = await fetch(`https://formsubmit.co/ajax/${FORM_EMAIL}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          name: v.name, email: v.email, phone: v.phone, message: v.msg,
+          _subject: 'New enquiry — letstalkheal.com',
+        }),
+      });
+      const d = await r.json();
+      if (d.success === true || d.success === 'true') {
+        showStatus("Thank you — your message has been sent. We'll be in touch soon.", true);
+        ['fname','femail','fphone','fmsg'].forEach(id => f(id).value = '');
+      } else { throw new Error('send failed'); }
+    } catch {
+      showStatus('Could not send right now. Please use WhatsApp above, or email us directly.', false);
+    } finally {
+      btn.disabled = false; btn.textContent = label;
+    }
+  });
 </script>
 </body>
 </html>

@@ -167,8 +167,9 @@
   /* CTA banner */
   .cta{padding:0}
   .cta-inner{background:var(--forest);border-radius:26px;padding:64px 56px;display:flex;align-items:center;justify-content:space-between;gap:32px;position:relative;overflow:hidden}
-  .cta-inner::before{content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;border:1.5px solid rgba(247,244,238,.14);border-radius:50%}
-  .cta-inner::after{content:"";position:absolute;right:20px;top:40px;width:160px;height:160px;border:1.5px solid rgba(247,244,238,.12);border-radius:50%}
+  .cta-inner::before{content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;border:1.5px solid rgba(247,244,238,.14);border-radius:50%;pointer-events:none}
+  .cta-inner::after{content:"";position:absolute;right:20px;top:40px;width:160px;height:160px;border:1.5px solid rgba(247,244,238,.12);border-radius:50%;pointer-events:none}
+  .cta .btn-cream{position:relative;z-index:1}
   .cta h2{color:var(--cream);font-size:clamp(26px,3vw,36px)}
   .cta p{color:rgba(247,244,238,.75);margin-top:10px}
 

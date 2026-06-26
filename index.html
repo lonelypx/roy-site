@@ -303,7 +303,7 @@
   <div class="wrap hero-grid">
     <div class="stagger-group">
       <span class="eyebrow">Confidential talk sessions</span>
-      <h1>A Safe Space to Talk, Heal, and&nbsp;Grow</h1>
+      <h1>A Safe Space to Talk, Heal, and&nbsp;Grow by <em>Ranjini&nbsp;George</em></h1>
       <p class="lead">Life can feel overwhelming at times. Whether you're dealing with stress, relationship challenges, grief, or anxiety — we're here to listen, without judgment.</p>
       <p class="assure">You don't have to face everything alone.</p>
       <div class="hero-cta">
@@ -457,8 +457,6 @@
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l4.9-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.2 0-.3 0-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.9 4.5 4 .6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.4-.2z"/></svg>
         Send via WhatsApp
       </button>
-      <div class="or-divider">or</div>
-      <button class="btn btn-outline" type="button" id="emailBtn" style="width:100%;justify-content:center">Email Us Instead →</button>
       <p class="form-status" id="formStatus" hidden></p>
       <p class="form-note"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Your message is private and confidential.</p>
     </div>
@@ -478,7 +476,7 @@
       </nav>
       <div class="socials">
         <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 8h2V5h-2a4 4 0 0 0-4 4v2H8v3h2v6h3v-6h2.2l.6-3H13V9a1 1 0 0 1 1-1z"/></svg></a>
-        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.5"/><circle cx="17" cy="7" r=".8" fill="currentColor"/></svg></a>
+        <a href="https://www.instagram.com/letstalkhealbyranjini" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.5"/><circle cx="17" cy="7" r=".8" fill="currentColor"/></svg></a>
       </div>
     </div>
     <p class="foot-bottom">© 2026 Someone To Talk To. All rights reserved. · Confidential, supportive talk sessions — not a substitute for medical or psychiatric care.</p>
@@ -537,32 +535,6 @@
     if (!v.name && !v.msg) { showStatus('Please add your name or a short message first.', false); return; }
     const text = `Hi, I'd like to book a session.\n\nName: ${v.name || '—'}\nEmail: ${v.email || '—'}\nPhone: ${v.phone || '—'}\n\n${v.msg || ''}`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
-  });
-
-  f('emailBtn').addEventListener('click', async (e) => {
-    const v = readFields();
-    if (!v.email || !v.msg) { showStatus('Please add your email and a message so we can reply.', false); return; }
-    const btn = e.currentTarget, label = btn.textContent;
-    btn.disabled = true; btn.textContent = 'Sending…';
-    try {
-      const r = await fetch(`https://formsubmit.co/ajax/${FORM_EMAIL}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          name: v.name, email: v.email, phone: v.phone, message: v.msg,
-          _subject: 'New enquiry — letstalkheal.com',
-        }),
-      });
-      const d = await r.json();
-      if (d.success === true || d.success === 'true') {
-        showStatus("Thank you — your message has been sent. We'll be in touch soon.", true);
-        ['fname','femail','fphone','fmsg'].forEach(id => f(id).value = '');
-      } else { throw new Error('send failed'); }
-    } catch {
-      showStatus('Could not send right now. Please use WhatsApp above, or email us directly.', false);
-    } finally {
-      btn.disabled = false; btn.textContent = label;
-    }
   });
 </script>
 </body>
